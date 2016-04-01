@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.estsoft.bookmall.vo.BookVO;
-import com.estsoft.bookmall.vo.CartVO;
+import com.estsoft.bookmall.vo.MemberVO;
 
-public class CartDao {
-
+public class MemberDao {
+	
 	// 커넥션 얻기
 	private Connection getConnection() throws SQLException {
 		Connection conn = null;
@@ -34,9 +34,9 @@ public class CartDao {
 	
 	
 	
-	public List<CartVO> getList() {
+	public List<MemberVO> getList() {
 		
-		List<CartVO> list = new ArrayList<CartVO>();
+		List<MemberVO> list = new ArrayList<MemberVO>();
 		
 		Connection conn = null;
 		Statement stmt = null;
@@ -48,21 +48,23 @@ public class CartDao {
 			stmt = conn.createStatement();
 			
 			//4. SQL 실행
-			String sql = "select member_no, book_no, quantity from cart";
+			String sql = "select member_no, email, password, name from member";
 			rs = stmt.executeQuery( sql );
 			
 			// 5. 데이터 받아오기 
 			while( rs.next() ) {
 				Long memberNo = rs.getLong( 1 );
-				Long bookNo = rs.getLong( 2 );
-				Long quantity = rs.getLong( 3 );
+				String email = rs.getString( 2 );
+				Long password = rs.getLong( 3 );
+				String name = rs.getString( 4 );
 				
-				CartVO cartVO = new CartVO();
-				cartVO.setMemberNo(memberNo);
-				cartVO.setBookNo(bookNo);
-				cartVO.setQuantity(quantity);
+				MemberVO memberVO = new MemberVO();
+				memberVO.setMemberNo(memberNo);
+				memberVO.setEmail(email);
+				memberVO.setPassword(password);
+				memberVO.setName(name);
 				
-				list.add( cartVO );
+				list.add( memberVO );
 			}
 		} catch( SQLException ex ) {
 			System.out.println( "SQL 오류:" + ex );
@@ -84,20 +86,21 @@ public class CartDao {
 		return list;
 	}
 	
-	public void insert( CartVO cartVO ) {
+	
+	public void insert( MemberVO memberVO ) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = getConnection();
 			
 			//3. Statement 준비
-			String sql = "insert into cart values( ?, ?, ?)";
+			String sql = "insert into member values(  null, ?, ?, ?)";
 			pstmt = conn.prepareStatement(sql);
 			
 			//4. bind
-			pstmt.setLong( 1, cartVO.getMemberNo() );
-			pstmt.setLong( 2, cartVO.getBookNo() );
-			pstmt.setLong( 3, cartVO.getQuantity() );
+			pstmt.setString( 1, memberVO.getEmail() );
+			pstmt.setLong( 2, memberVO.getPassword() );
+			pstmt.setString( 3, memberVO.getName() );
 			
 			//5. SQL 실행
 			pstmt.executeUpdate();
@@ -118,4 +121,5 @@ public class CartDao {
 			}
 		}		
 	}
+
 }
